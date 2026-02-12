@@ -1,87 +1,109 @@
-# Como instalar/configurar/usar o `shell_scripts` no `Linux Ubuntu`
+# Como instalar/configurar/usar o `npt` no `Linux Ubuntu`
 
 ## Resumo
 
-Guia direto para instalar o `shell_scripts` no seu projeto.
+Guia direto para instalar e verificar o *Network Time Protocol* (NTP) no Ubuntu pelo Terminal Emulator.
 
 ## _Abstract_
 
-_A straightforward guide to installing `shell_scripts` in your project._
+_A straightforward guide to installing and verifying Network Time Protocol (NTP) on Ubuntu via Terminal Emulator._
 
 
 ## Descrição
 
-### `shell_scripts`
+### `npt` (Network Time Protocol)
 
-O `shell_scripts` é um repositório do `GitHub` para consolidar códigos genéricos em `shell` para
-serem utilizados em qualquer outro projeto. Ele também inclui um _script_ chamado `prepare_repo.sh`
-que clona outros repos dentro do seu projeto com demais códigos genéricos em diversas linguagens e
-arquivos que são convenientes existirem em projetos.
+O *Network Time Protocol* (NTP) mantém o relógio do sistema sincronizado com servidores de tempo.
+No Ubuntu 22.04 LTS, a sincronização já vem integrada via `systemd-timesyncd`,
+mas você pode instalar o `ntp` clássico ou o `chrony` para mais controle.
 
 
 ## Pré-requisitos
 
-- Git instalado
-- SSH key configurada no GitHub
-- Acesso ao GitHub (repositório `edftechnology/shell_scripts`)
+- Ubuntu 22.04 LTS (ou superior)
+- Acesso ao Terminal Emulator
+- Permissões de `sudo` para instalar pacotes (se necessário)
 
 
-## 1. Clonar o repo `shell_scripts` no repositório do seu projeto
+## 1. Usar o serviço padrão (`systemd-timesyncd`) — recomendado
 
-Para clonar o `shell_scripts`, siga os passos abaixo:
+O Ubuntu já usa o `systemd-timesyncd`.
 
-1. Abra o `Terminal Emulator`. Você pode fazer isso pressionando:
-
-    ```bash
-    Ctrl + Alt + T
-    ```
-
-2. Acessar a pasta do seu projeto:
+1. Verificar se está ativo:
 
 ```bash
-cd <caminho_ate_o_projeto>
+timedatectl status
 ```
 
-3. Clonar o `shell_scripts`:
+Você deve ver algo como:
+
+```
+System clock synchronized: yes
+NTP service: active
+```
+
+2. Se não estiver ativo:
 
 ```bash
-git submodule add \
-    git@github.com:edftechnology/shell_scripts.git \
-    subs/submodules/shell_scripts
+sudo timedatectl set-ntp true
 ```
 
+Pronto. Já está sincronizando.
 
-## 2. Inicializar submodules existentes (se aplicável)
 
-Se o seu repositório já tiver um `.gitmodules`, inicialize com:
+## 2. Instalar o NTP tradicional (`ntp`)
+
+Se você quiser instalar o daemon clássico:
+
+1. Atualizar os pacotes:
 
 ```bash
-git submodule update --init --recursive
+sudo apt update
 ```
 
-
-## 3. (Opcional) Executar o `prepare_repo.sh`
-
-É conveniente executar o `scripts/prepare_repo.sh` depois de clonar o `shell_scripts`,
-pois ele verifica se o seu repo está com todos os arquivos que é recomendado que um projeto
-tenha, sem excluir ou sobrescrever os arquivos existentes. Para isso, na raiz do seu projeto,
-execute o comando:
+2. Instalar o NTP:
 
 ```bash
-bash subs/submodules/shell_scripts/scripts/prepare_repo.sh
+sudo apt install ntp
 ```
 
-O script faz, de forma resumida:
+3. Verificar se o serviço está rodando:
 
-- Garante/atualiza submodules essenciais
-- Cria pastas padrão do projeto (docs, inputs, outputs, etc.)
-- Cria `__init__.py` onde for apropriado
+```bash
+sudo systemctl status ntp
+```
 
 
-## Compatibilidade
+## 3. Alternativa moderna: `chrony` (leve e recomendada)
 
-- Testado em Linux Ubuntu (recomendado 20.04+).
-- Deve funcionar em Debian e WSL, desde que o Git e o Bash estejam disponíveis.
+O Ubuntu 22.04 costuma usar o `chrony`, que é mais moderno que o NTP clássico.
+
+1. Instalar o `chrony`:
+
+```bash
+sudo apt install chrony
+```
+
+2. Verificar status:
+
+```bash
+sudo systemctl status chrony
+```
+
+3. Verificar sincronização:
+
+```bash
+chronyc tracking
+```
+
+
+## Qual escolher?
+
+Situação | Melhor opção
+--- | ---
+Uso comum | `systemd-timesyncd`
+Servidor ou maior controle | `chrony`
+Compatibilidade antiga | `ntp`
 
 
 ## Licença
@@ -90,10 +112,10 @@ Este repositório inclui o arquivo `LICENSE.txt`.
 
 ## Contato e suporte
 
-Para dúvidas ou problemas, abra uma issue no repositório do `GitHub`.
+Para dúvidas ou problemas, abra uma issue no repositório do GitHub.
 
 
 ## Referências
 
-[1] OPENAI. ***Depurar código shell***. Disponível em: <https://chatgpt.com/g/g-p-6761f07a2b1c81918aa789debc65d68c/c/67c06bee-d0b8-8002-aa30-d2d0d57f1cfe>. ChatGPT. Acessado em: 11/12/2025.
+[1] OPENAI. ***Instalar***. Disponível em: <https://chatgpt.com/g/g-p-6980caf949648191ad6acfcdbe590f9e-instalar/c/698ccf15-ca7c-8330-848e-85b2aefb28be>. ChatGPT. Acessado em: 12/02/2026.
 
